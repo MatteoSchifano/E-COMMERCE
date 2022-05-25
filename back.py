@@ -181,6 +181,7 @@ if __name__ == '__main__':
     nome = prodotti
     produttore = produttori
     prezzo = prezzi
-    for x,y,z in zip(nome, produttore, prezzo):
-        obj = Prodotto(x,y,z, cli='mongodb://localhost:27017/')
+    print(tags)
+    for x,y,z,t in zip(nome, produttore, prezzo, tags):
+        obj = Prodotto(x,y,z,t, cli='mongodb://localhost:27017/')
         obj.packProd()

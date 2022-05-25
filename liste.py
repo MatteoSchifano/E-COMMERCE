@@ -3,3 +3,6 @@ prodotti = ['iphone 13', 'jbl go', 'mela', 'pera',  'tel samsung', 'palla', 'gua
 produttori = ['apple', 'cassa', 'melinda', 'perinda',  'samsung', 'bho', 'adidas' ]
 prezzi = [1000,50,2,3,600,10,15]
 
+tags = [('telefono', 'apple', 'iphone', 'informatica'), ('cassa', 'informatica', 'musica'),
+    ('cibo', 'frutta'), ('cibo', 'frutta'),('telefono', 'gioco', 'samsung', 'informatica'),
+    ('gioco', 'sport'), ('gioco', 'sport')]
