@@ -15,8 +15,8 @@ def insertUser():
     nome = request.form.get("nome")
     cognome = request.form.get("cognome")
     citta = request.form.get("citta")
-    obj = Utente(nome, cognome, user, citta, psw)
-    # obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
+    # obj = Utente(nome, cognome, user, citta, psw)
+    obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
     obj.packUser()
     return render_template("index.html")
 
@@ -32,7 +32,7 @@ def checkCredentials():
     psw = ahsValue(request.form.get("password"))
     check, last = logIn(user, psw)
     if check:
-        return render_template("prodotti.html", username=user, lastAccess=last, dati=MainDb.serchData(coll='prodotto', qwer={}))
+        return render_template("prodotti.html", username=user, lastAccess=last, dati=MainDb().serchData(coll='prodotto', qwer={}))
     else:
         return render_template("login_error.html")
 

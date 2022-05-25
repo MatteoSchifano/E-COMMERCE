@@ -4,7 +4,8 @@ import hashlib
 
 class MainDb: # gestione db
 
-    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    # def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
         self.cli = cli
         self.db = db
 
@@ -175,5 +176,5 @@ if __name__ == '__main__':
     produttore = ['bauli', 'beretta', 'mareblu']
     prezzo = [3, 5, 20]
     for x,y,z in zip(nome, produttore, prezzo):
-        obj = Prodotto(x,y,z)
+        obj = Prodotto(x,y,z, cli='mongodb://localhost:27017/')
         obj.packProd()
