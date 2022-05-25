@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from back import Utente, Prodotto
+from back import Utente, Prodotto, ahsValue
 app = Flask(__name__)
 
 
@@ -29,8 +29,8 @@ def getSingupPage():
 @app.route("/dologin", methods=['post'])
 def checkCredentials():
     user = request.form.get("username")
-    psw = Utente.ahsValue(request.form.get("password"))
-    check, last = Utente.logIn(user, psw)
+    psw = request.form.get("password")
+    check, last = Utente.logIn(Utente, user, psw)
     if check:
         return render_template("welcome.html", username=user, lastAccess=last)
     else:

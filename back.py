@@ -4,7 +4,7 @@ import hashlib
 
 class MainDb: # gestione db
 
-    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot', coll = 'main'):
+    def __init__(self, coll, cli = 'mongodb://localhost:37000/', db = 'Iot'):
         self.cli = cli
         self.db = db
         self.coll = coll
@@ -120,20 +120,20 @@ class Utente(MainDb):
         else:
             return dct
 
-    def ahsValue(self, password:str):
-        # crea un ahs costruito con password
-        ahs = hashlib.sha256(password.encode('utf-8'))
-        # restituisce hash
-        return ahs.hexdigest()
-
     def logIn(self, user, pasw):
         qw = {
                 'username':user,
-                'password':pasw
+                'password':ahsValue(pasw)
              }
-        if len(self.serchData(qw)) == 1:
-            last = self.serchData(qw)['lastAcc']
+        if len(self.serchData(Utente, qw)) == 1:
+            last = self.serchData(Utente, qw)['lastAcc']
             return True, last
+
+def ahsValue(password:str):
+    # crea un ahs costruito con password
+    ahs = hashlib.sha256(password.encode('utf-8'))
+    # restituisce hash
+    return ahs.hexdigest()
 
 class Prodotto(MainDb):
 
