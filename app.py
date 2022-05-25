@@ -15,8 +15,8 @@ def insertUser():
     nome = request.form.get("nome")
     cognome = request.form.get("cognome")
     citta = request.form.get("citta")
-    obj = Utente(nome, cognome, user, citta, psw)
-    # obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
+    # obj = Utente(nome, cognome, user, citta, psw)
+    obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
     obj.packUser()
     return render_template("index.html")
 

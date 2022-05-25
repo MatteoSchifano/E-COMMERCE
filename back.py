@@ -1,10 +1,12 @@
 import datetime
 from pymongo import MongoClient
+from liste import *
 import hashlib
 
 class MainDb: # gestione db
 
-    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    # def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
         self.cli = cli
         self.db = db
 
@@ -160,10 +162,14 @@ class GestisciUtente(Utente):
 class Prodotto(MainDb):
 
 
-    def __init__(self, nome, produttore, prezzo, cli='mongodb://localhost:37000/', db='Iot', coll='prodotto'):      
+    def __init__(self, nome, produttore, prezzo, tags:list, cli='mongodb://localhost:37000/', db='Iot', coll='prodotto'):      
+        '''crea il prodotto
+        tags : lista di tag
+        '''        
         self.nome = nome
         self.produttore = produttore
         self.prezzo = prezzo
+        self.tags  = tags
         self.coll = coll
         super().__init__(cli, db)
     
@@ -175,7 +181,8 @@ class Prodotto(MainDb):
         dct = {
                 'nome':self.nome,
                 'produttore':self.produttore,
-                'prezzo':self.prezzo
+                'prezzo':self.prezzo,
+                'tags':self.tags
         }
         if ins == True:
             self.insertData(self.coll, dct)
@@ -195,11 +202,37 @@ class GestisciProdotto(Prodotto):
         '''
         lst = list(self.serchDataProdotto(qwer={}))
         return lst
+    
+# ----------------------------------------------------------------
+# liear regression
+# ----------------------------------------------------------------
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
+
+def predicta():
+    x = np.array(x).reshape(-1, 1)
+    y = np.array(y).reshape(-1, 1)
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        x, y, random_state=42)
+    reg_bp = LinearRegression()
+    reg_bp.fit(X_train, y_train)
+
+    y_pred = reg_bp.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
 
 if __name__ == '__main__':
-    nome = ['pane', 'salame', 'caviale']
-    produttore = ['bauli', 'beretta', 'mareblu']
-    prezzo = [3, 5, 20]
-    for x,y,z in zip(nome, produttore, prezzo):
-        obj = Prodotto(x,y,z)
+    nome = prodotti
+    produttore = produttori
+    prezzo = prezzi
+    print(tags)
+    for x,y,z,t in zip(nome, produttore, prezzo, tags):
+        obj = Prodotto(x,y,z,t, cli='mongodb://localhost:27017/')
         obj.packProd()
