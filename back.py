@@ -1,5 +1,6 @@
 import datetime
 from pymongo import MongoClient
+from liste import *
 import hashlib
 
 class MainDb: # gestione db
@@ -150,10 +151,14 @@ class Prodotto(MainDb):
 
     coll='prodotto'
 
-    def __init__(self, nome, produttore, prezzo, cli='mongodb://localhost:37000/', db='Iot'):      
+    def __init__(self, nome, produttore, prezzo, tags:list, cli='mongodb://localhost:37000/', db='Iot'):      
+        '''crea il prodotto
+        tags : lista di tag
+        '''        
         self.nome = nome
         self.produttore = produttore
         self.prezzo = prezzo
+        self.tags  = tags
         super().__init__(cli, db)
     
     def packProd(self, ins=True):
@@ -164,7 +169,8 @@ class Prodotto(MainDb):
         dct = {
                 'nome':self.nome,
                 'produttore':self.produttore,
-                'prezzo':self.prezzo
+                'prezzo':self.prezzo,
+                'tags':self.tags
         }
         if ins == True:
             self.insertData(self.coll, dct)
@@ -172,9 +178,9 @@ class Prodotto(MainDb):
             return dct
 
 if __name__ == '__main__':
-    nome = ['pane', 'salame', 'caviale']
-    produttore = ['bauli', 'beretta', 'mareblu']
-    prezzo = [3, 5, 20]
+    nome = prodotti
+    produttore = produttori
+    prezzo = prezzi
     for x,y,z in zip(nome, produttore, prezzo):
         obj = Prodotto(x,y,z, cli='mongodb://localhost:27017/')
         obj.packProd()
