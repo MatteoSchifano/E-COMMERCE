@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from back import MainDb, Utente, Prodotto, ahsValue, logIn
+from back import Utente, GestisciUtente, Prodotto, GestisciProdotto
 app = Flask(__name__)
 
 
@@ -11,7 +11,7 @@ def getIndex():
 @app.route("/doregister", methods=["post"])
 def insertUser():
     user = request.form.get("username")
-    psw = ahsValue(request.form.get("password"))
+    psw = Utente.ahsValue(request.form.get("password"))
     nome = request.form.get("nome")
     cognome = request.form.get("cognome")
     citta = request.form.get("citta")
@@ -29,10 +29,10 @@ def getSingupPage():
 @app.route("/dologin", methods=['post'])
 def checkCredentials():
     user = request.form.get("username")
-    psw = ahsValue(request.form.get("password"))
-    check, last = logIn(user, psw)
+    psw = Utente.ahsValue(request.form.get("password"))
+    check, last = GestisciUtente.logIn(user, psw)
     if check:
-        return render_template("prodotti.html", username=user, lastAccess=last, dati=MainDb().serchData(coll='prodotto', qwer={}))
+        return render_template("prodotti.html", username=user, lastAccess=last, dati=GestisciProdotto.estrai())
     else:
         return render_template("login_error.html")
 
