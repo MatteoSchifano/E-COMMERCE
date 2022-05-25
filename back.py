@@ -84,9 +84,13 @@ class MainDb: # gestione db
         self.deleteData(coll, qw)
         self.insertData(val)
 
-class Utente(MainDb):
+    def ahsValue(password:str):
+        # crea un ahs costruito con password
+        ahs = hashlib.sha256(password.encode('utf-8'))
+        # restituisce hash
+        return ahs.hexdigest()
 
-    coll = 'utente'
+class Utente(MainDb):
 
     def __init__(self,  nome, cognome, username, password, citta, cli='mongodb://localhost:37000/', db='Iot'):
         self.nome = nome
@@ -94,16 +98,8 @@ class Utente(MainDb):
         self.username = username
         self.password = password
         self.citta = citta
-        self.lastAcc = None       
+        self.lastAcc = self.lastAccess()       
         super().__init__(cli, db)
-    
-    def serchData(self, coll, qwer: dict, proj: dict = None, lim: int = 20):
-        return super().serchData(coll, qwer, proj, lim)
-
-    def getLastAccess(self, replace=True):
-        resp = self.lastAcc
-        if replace: self.lastAcc = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return resp
 
     def packUser(self, ins=True):
         '''
@@ -117,42 +113,58 @@ class Utente(MainDb):
             'username':self.username,
             'password':self.password,
             'citta':self.citta,
-            'lastAcc':self.getLastAccess()
+            'lastAcc':self.lastAcc
         }
         if ins == True:
-            self.insertData(self.coll, dct)
+            self.insertDataUtente(dct)
         else:
             return dct
 
-def logIn(user, pasw):
-    qw = {
-            'username':user,
-            'password':pasw
-            }
-    coll = 'utente'
-    obj = MainDb()
-    qwerry = obj.serchData(coll, qw)
-    print(qwerry)
-    if len(qwerry)==1:
-        last = qwerry[0]['lastAcc']
-        return True, last
-    else:
-        return False, None
+    def lastAccess():
+        '''
+        ritorna una variabile con data e ora attuale
+        '''
+        resp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return resp
 
-def ahsValue(password:str):
-    # crea un ahs costruito con password
-    ahs = hashlib.sha256(password.encode('utf-8'))
-    # restituisce hash
-    return ahs.hexdigest()
+class GestisciUtente(Utente):
+
+    coll = 'utente'
+
+    def updateDataAccess(self, doc:dict, one=True):
+        fil = doc['_id']
+        new = {'lastAcc': self.lastAccess()}
+        return super().updateData(self.coll, fil, new, one)
+
+    def serchDataUtente(self, qwer: dict, proj: dict = None, lim: int = 20):
+        return super().serchData(self.coll, qwer, proj, lim)
+
+    def insertDataUtente(self, dct, one=True):   
+        return super().insertData(self.coll, dct, one)
+
+    def logIn(self, user, pasw):
+        qw =    {
+                'username':user,
+                'password':pasw
+                }
+
+        qwerry = self.serchDataUtente(qw)
+        if len(qwerry)==1:
+            last = qwerry[0]['lastAcc']
+            self.updateDataAccess(qwerry[0])
+            return True, last
+        else:
+            return False, None
+
 
 class Prodotto(MainDb):
 
-    coll='prodotto'
 
-    def __init__(self, nome, produttore, prezzo, cli='mongodb://localhost:37000/', db='Iot'):      
+    def __init__(self, nome, produttore, prezzo, cli='mongodb://localhost:37000/', db='Iot', coll='prodotto'):      
         self.nome = nome
         self.produttore = produttore
         self.prezzo = prezzo
+        self.coll = coll
         super().__init__(cli, db)
     
     def packProd(self, ins=True):
@@ -169,6 +181,20 @@ class Prodotto(MainDb):
             self.insertData(self.coll, dct)
         else:
             return dct
+
+class GestisciProdotto(Prodotto):
+
+    coll='prodotto'
+
+    def serchDataProdotto(self, qwer: dict, proj: dict = None, lim: int = 20):
+        return super().serchData(self.coll, qwer, proj, lim)
+
+    def estrai(self):
+        '''
+        estrae tutti i documenti presenti nella collezione prodotto
+        '''
+        lst = list(self.serchDataProdotto(qwer={}))
+        return lst
 
 if __name__ == '__main__':
     nome = ['pane', 'salame', 'caviale']
