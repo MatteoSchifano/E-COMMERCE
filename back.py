@@ -5,8 +5,8 @@ import hashlib
 
 class MainDb: # gestione db
 
-    # def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
-    def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    # def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
         self.cli = cli
         self.db = db
 
@@ -51,11 +51,12 @@ class MainDb: # gestione db
         one: True update one
         one: False update many
         '''
+        new_val = {"$set":new}
         client, col = self.connect(coll)
         if one == True:
-            col.update_one(fil, new)
+            col.update_one(fil, new_val)
         else:
-            col.update_many(fil, new)
+            col.update_many(fil, new_val)
         client.close()
 
     def deleteData(self, coll, fil:dict, one=True):
@@ -86,55 +87,26 @@ class MainDb: # gestione db
         self.deleteData(coll, qw)
         self.insertData(val)
 
+class HasH:
+
     def ahsValue(password:str):
         # crea un ahs costruito con password
         ahs = hashlib.sha256(password.encode('utf-8'))
         # restituisce hash
         return ahs.hexdigest()
-
-class Utente(MainDb):
-
-    def __init__(self,  nome, cognome, username, password, citta, cli='mongodb://localhost:37000/', db='Iot'):
-        self.nome = nome
-        self.cognome = cognome
-        self.username = username
-        self.password = password
-        self.citta = citta
-        self.lastAcc = self.lastAccess()       
-        super().__init__(cli, db)
-
-    def packUser(self, ins=True):
-        '''
-        ins: True inserisce nel db
-        ins: False ritorna un dizionario con gli attributi dell'oggetto
-        '''
-        
-        dct = {
-            'nome':self.nome,
-            'cognome':self.cognome,
-            'username':self.username,
-            'password':self.password,
-            'citta':self.citta,
-            'lastAcc':self.lastAcc
-        }
-        if ins == True:
-            self.insertDataUtente(dct)
+    
+    def confontaPass(pasw1:str, pasw2:str):
+        if pasw1 == pasw2:
+            return True
         else:
-            return dct
+            return False
 
-    def lastAccess():
-        '''
-        ritorna una variabile con data e ora attuale
-        '''
-        resp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        return resp
-
-class GestisciUtente(Utente):
+class GestisciUtente(MainDb):
 
     coll = 'utente'
 
     def updateDataAccess(self, doc:dict, one=True):
-        fil = doc['_id']
+        fil = {'_id':doc['_id']}
         new = {'lastAcc': self.lastAccess()}
         return super().updateData(self.coll, fil, new, one)
 
@@ -157,12 +129,64 @@ class GestisciUtente(Utente):
             return True, last
         else:
             return False, None
+            
+    def lastAccess(self):
+        '''
+        ritorna una variabile con data e ora attuale
+        '''
+        resp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return resp
 
+class CreaUtente(GestisciUtente):
 
-class Prodotto(MainDb):
+    def __init__(self,  nome, cognome, username, password, citta):
+        self.nome = nome
+        self.cognome = cognome
+        self.username = username
+        self.password = password
+        self.citta = citta
+        self.lastAcc = self.lastAccess()       
+        super().__init__()
 
+    def packUser(self, ins=True):
+        '''
+        ins: True inserisce nel db
+        ins: False ritorna un dizionario con gli attributi dell'oggetto
+        '''
+        
+        dct = {
+            'nome':self.nome,
+            'cognome':self.cognome,
+            'username':self.username,
+            'password':self.password,
+            'citta':self.citta,
+            'lastAcc':self.lastAcc
+        }
+        if ins == True:
+            self.insertDataUtente(dct)
+        else:
+            return dct
 
-    def __init__(self, nome, produttore, prezzo, tags:list, cli='mongodb://localhost:37000/', db='Iot', coll='prodotto'):      
+class GestisciProdotto(MainDb):
+
+    coll='prodotto'
+
+    def serchDataProdotto(self, qwer: dict, proj: dict = None, lim: int = 20):
+        return super().serchData(self.coll, qwer, proj, lim)
+    
+    def insertDataProdotto(self, dct, one=True):
+        return super().insertData(self.coll, dct, one)
+
+    def estrai(self):
+        '''
+        estrae tutti i documenti presenti nella collezione prodotto
+        '''
+        lst = list(self.serchDataProdotto(qwer={}))
+        return lst
+
+class CreaProdotto(GestisciProdotto):
+
+    def __init__(self, nome, produttore, prezzo, tags:list):      
         '''crea il prodotto
         tags : lista di tag
         '''        
@@ -170,8 +194,7 @@ class Prodotto(MainDb):
         self.produttore = produttore
         self.prezzo = prezzo
         self.tags  = tags
-        self.coll = coll
-        super().__init__(cli, db)
+        super().__init__()
     
     def packProd(self, ins=True):
         '''
@@ -185,30 +208,7 @@ class Prodotto(MainDb):
                 'tags':self.tags
         }
         if ins == True:
-            self.insertData(self.coll, dct)
+            self.insertDataProdotto(dct)
         else:
             return dct
-
-class GestisciProdotto(Prodotto):
-
-    coll='prodotto'
-
-    def serchDataProdotto(self, qwer: dict, proj: dict = None, lim: int = 20):
-        return super().serchData(self.coll, qwer, proj, lim)
-
-    def estrai(self):
-        '''
-        estrae tutti i documenti presenti nella collezione prodotto
-        '''
-        lst = list(self.serchDataProdotto(qwer={}))
-        return lst
     
-
-if __name__ == '__main__':
-    nome = prodotti
-    produttore = produttori
-    prezzo = prezzi
-    print(tags)
-    for x,y,z,t in zip(nome, produttore, prezzo, tags):
-        obj = Prodotto(x,y,z,t, cli='mongodb://localhost:27017/')
-        obj.packProd()

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from back import Utente, GestisciUtente, Prodotto, GestisciProdotto
+from back import CreaUtente, GestisciUtente, CreaProdotto, GestisciProdotto, HasH
 app = Flask(__name__)
 
 
@@ -11,12 +11,12 @@ def getIndex():
 @app.route("/doregister", methods=["post"])
 def insertUser():
     user = request.form.get("username")
-    psw = Utente.ahsValue(request.form.get("password"))
+    psw = HasH.ahsValue(request.form.get("password"))
     nome = request.form.get("nome")
     cognome = request.form.get("cognome")
     citta = request.form.get("citta")
     # obj = Utente(nome, cognome, user, citta, psw)
-    obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
+    obj = CreaUtente(nome, cognome, user, psw, citta)
     obj.packUser()
     return render_template("index.html")
 
@@ -29,10 +29,10 @@ def getSingupPage():
 @app.route("/dologin", methods=['post'])
 def checkCredentials():
     user = request.form.get("username")
-    psw = Utente.ahsValue(request.form.get("password"))
-    check, last = GestisciUtente.logIn(user, psw)
+    psw = HasH.ahsValue(request.form.get("password"))
+    check, last = GestisciUtente().logIn(user, psw)
     if check:
-        return render_template("prodotti.html", username=user, lastAccess=last, dati=GestisciProdotto.estrai())
+        return render_template("prodotti.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
     else:
         return render_template("login_error.html")
 
@@ -53,7 +53,7 @@ def getNuovoProdotto():
     prezzo = request.form.get('prezzo')
     '''password = request.form.get('pasw')
     citta = request.form.get('citta')'''
-    obj = Prodotto(nome, produttore, prezzo)
+    obj = CreaProdotto(nome, produttore, prezzo)
     obj.packProd()
     return render_template('table.html')
     
