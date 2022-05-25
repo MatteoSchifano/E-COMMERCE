@@ -68,16 +68,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    
+    
 </head>
 
 <body>
     <form action="/doregister" method="post">
         <h1>Register</h1>
         <label for="id" class="label">Username</label>
-        <input type="text" name="username" placeholder="Id">
+        <input type="text" name="username" placeholder="Username">
 
         <label for="password" class="label">Password</label>
-        <input type="text" name="password" placeholder="Password">
+        <input type="password" id='pw' name="password" placeholder="Password">
+
+        <label for="password2" class="label">Password</label>
+        <input type="password" id='pw2' name="password2" placeholder="Conferma password">
+
+        <span id = "message" style="color:red"> </span> <br><br> 
 
         <label for="id" class="label">Nome</label>
         <input type="text" name="nome" placeholder="Nome">
@@ -90,6 +97,36 @@
 
         <input type="submit">
         <a href="/login">Vai alla pagina del login</a>
+        <script>  
+            function verifyPassword() {  
+              var pw = document.getElementById("pw1").value;
+              var pw2 = document.getElementById("pw2").value;  
+              //check empty password field  
+              if(pw == "") {  
+                 document.getElementById("message").innerHTML = "**Fill the password please!";  
+                 return false;  
+              }  
+            
+             //minimum password length validation  
+              if(pw.length < 8) {  
+                 document.getElementById("message").innerHTML = "**Password length must be atleast 8 characters";  
+                 return false;  
+              }  
+              
+            //maximum length of password validation  
+              if(pw.length > 15) {  
+                 document.getElementById("message").innerHTML = "**Password length must not exceed 15 characters";  
+                 return false;  
+              } else {  
+                 alert("Password is correct");  
+              }  
+              //correct insert 
+              if(pw==pw2) {  
+                 document.getElementById("message").innerHTML = "**Password errata";  
+                 return false;  
+              }  
+            }  
+            </script
     </form>
 </body>
 
