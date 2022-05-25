@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from back import Utente, Prodotto, ahsValue
+from back import Utente, Prodotto, ahsValue, logIn
 app = Flask(__name__)
 
 
@@ -11,12 +11,12 @@ def getIndex():
 @app.route("/doregister", methods=["post"])
 def insertUser():
     user = request.form.get("username")
-    psw = request.form.get("password")
+    psw = ahsValue(request.form.get("password"))
     nome = request.form.get("nome")
     cognome = request.form.get("cognome")
     citta = request.form.get("citta")
-    # obj = Utente(nome, cognome, user, citta, psw)
-    obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
+    obj = Utente(nome, cognome, user, citta, psw)
+    # obj = Utente(nome, cognome, user, psw, citta, cli='mongodb://localhost:27017/')
     obj.packUser()
     return render_template("index.html")
 
@@ -29,8 +29,8 @@ def getSingupPage():
 @app.route("/dologin", methods=['post'])
 def checkCredentials():
     user = request.form.get("username")
-    psw = request.form.get("password")
-    check, last = Utente.logIn(Utente, user, psw)
+    psw = ahsValue(request.form.get("password"))
+    check, last = logIn(user, psw)
     if check:
         return render_template("welcome.html", username=user, lastAccess=last)
     else:
