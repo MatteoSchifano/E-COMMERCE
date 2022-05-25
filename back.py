@@ -4,45 +4,44 @@ import hashlib
 
 class MainDb: # gestione db
 
-    def __init__(self, coll, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
         self.cli = cli
         self.db = db
-        self.coll = coll
 
-    def connect(self):
+    def connect(self, coll):
         '''
         connessione al db, ricordarsi di chiuderla con client.close()
         ritorna client e coll
         '''
         client = MongoClient(self.cli)
         db = client[self.db]
-        coll = db[self.coll]
-        return client, coll
+        col = db[coll]
+        return client, col
 
     # contiene tutti i metodi generali
-    def insertData(self, dct, one=True):
+    def insertData(self, coll, dct, one=True):
         '''
         inserisce nel database un dizionario chiave valore
         se one = falso inserisce una lista di dizionari
         '''
-        client, coll = self.connect()
+        client, col = self.connect(coll)
         if type(dct)==dict and one==True:
-            coll.insert_one(dct)
+            col.insert_one(dct)
         elif type(dct)==list and one==False:
-            coll.insert_many(dct)
+            col.insert_many(dct)
         client.close()
 
-    def serchData(self, qwer:dict, proj:dict = None, lim:int = 20):
+    def serchData(self, coll, qwer:dict, proj:dict = None, lim:int = 20):
         '''
         restituisce una lista di dizionari corrispondenti alla qwerry
         '''
-        client, coll = self.connect()
-        post = coll.find(filter=qwer, projection=proj, limit=lim)
+        client, col = self.connect(coll)
+        post = list(col.find(filter=qwer, projection=proj, limit=lim))
         client.close()
         return post
         
 
-    def updateData(self, fil:dict, new:dict, one=True):
+    def updateData(self, coll, fil:dict, new:dict, one=True):
         '''
         aggiorna un documento in base al filtro
         fil: filtro da applicare
@@ -50,51 +49,56 @@ class MainDb: # gestione db
         one: True update one
         one: False update many
         '''
-        client, coll = self.connect()
+        client, col = self.connect(coll)
         if one == True:
-            coll.update_one(fil, new)
+            col.update_one(fil, new)
         else:
-            coll.update_many(fil, new)
+            col.update_many(fil, new)
         client.close()
 
-    def deleteData(self, fil:dict, one=True):
+    def deleteData(self, coll, fil:dict, one=True):
         '''
         elimina un dizionario presente nel db tramite un filtro
         fil: filtro
         one: True delete one
         one: False delete many and return number deleted
         '''
-        client, coll = self.connect()
+        client, col = self.connect(coll)
         if one == True:
-            coll.delete_one(fil)
+            col.delete_one(fil)
         else:
-            result = coll.delete_many(fil)
+            result = col.delete_many(fil)
             return result.deleted_count
         client.close()
 
-    def addData(self, idOld, new:dict):
+    def addData(self, coll, idOld, new:dict):
         '''
         aggiorna un documento con un dizionari con stessa chiave e stesso valore
         idOld: _id del dizionario a cui aggiungere delle chiavi/valore
         new: dizionario con le chiavi e con i valori da aggiungere
         '''
         qw = {'_id':idOld}
-        val = self.serchData(qw)
+        val = self.serchData(coll, qw)
         val = dict(val[0])
         val.update(**new)# aggiunge un vaore al json
-        self.deleteData(qw)
+        self.deleteData(coll, qw)
         self.insertData(val)
 
 class Utente(MainDb):
 
-    def __init__(self,  nome, cognome, username, password, citta, cli='mongodb://localhost:37000/', db='Iot', coll='utente'):
+    coll = 'utente'
+
+    def __init__(self,  nome, cognome, username, password, citta, cli='mongodb://localhost:37000/', db='Iot'):
         self.nome = nome
         self.cognome = cognome
         self.username = username
-        self.password = self.ahsValue(password)
+        self.password = password
         self.citta = citta
         self.lastAcc = None       
-        super().__init__(cli, db, coll)
+        super().__init__(cli, db)
+    
+    def serchData(self, coll, qwer: dict, proj: dict = None, lim: int = 20):
+        return super().serchData(coll, qwer, proj, lim)
 
     def getLastAccess(self, replace=True):
         resp = self.lastAcc
@@ -116,18 +120,24 @@ class Utente(MainDb):
             'lastAcc':self.getLastAccess()
         }
         if ins == True:
-            self.insertData(dct)
+            self.insertData(self.coll, dct)
         else:
             return dct
 
-    def logIn(self, user, pasw):
-        qw = {
-                'username':user,
-                'password':ahsValue(pasw)
-             }
-        if len(self.serchData(Utente, qw)) == 1:
-            last = self.serchData(Utente, qw)['lastAcc']
-            return True, last
+def logIn(user, pasw):
+    qw = {
+            'username':user,
+            'password':pasw
+            }
+    coll = 'utente'
+    obj = MainDb()
+    qwerry = obj.serchData(coll, qw)
+    print(qwerry)
+    if len(qwerry)==1:
+        last = qwerry[0]['lastAcc']
+        return True, last
+    else:
+        return False, None
 
 def ahsValue(password:str):
     # crea un ahs costruito con password
@@ -137,11 +147,13 @@ def ahsValue(password:str):
 
 class Prodotto(MainDb):
 
-    def __init__(self, nome, produttore, prezzo, cli='mongodb://localhost:37000/', db='Iot', coll='prodotto'):      
+    coll='prodotto'
+
+    def __init__(self, nome, produttore, prezzo, cli='mongodb://localhost:37000/', db='Iot'):      
         self.nome = nome
         self.produttore = produttore
         self.prezzo = prezzo
-        super().__init__(cli, db, coll)
+        super().__init__(cli, db)
     
     def packProd(self, ins=True):
         '''
@@ -154,6 +166,6 @@ class Prodotto(MainDb):
                 'prezzo':self.prezzo
         }
         if ins == True:
-            self.insertData(dct)
+            self.insertData(self.coll, dct)
         else:
             return dct
