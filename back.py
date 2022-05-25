@@ -169,3 +169,11 @@ class Prodotto(MainDb):
             self.insertData(self.coll, dct)
         else:
             return dct
+
+if __name__ == '__main__':
+    nome = ['pane', 'salame', 'caviale']
+    produttore = ['bauli', 'beretta', 'mareblu']
+    prezzo = [3, 5, 20]
+    for x,y,z in zip(nome, produttore, prezzo):
+        obj = Prodotto(x,y,z)
+        obj.packProd()

@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from back import Utente, Prodotto, ahsValue, logIn
+from back import MainDb, Utente, Prodotto, ahsValue, logIn
 app = Flask(__name__)
 
 
@@ -32,7 +32,7 @@ def checkCredentials():
     psw = ahsValue(request.form.get("password"))
     check, last = logIn(user, psw)
     if check:
-        return render_template("welcome.html", username=user, lastAccess=last)
+        return render_template("prodotti.html", username=user, lastAccess=last, dati=MainDb.serchData(coll='prodotto', qwer={}))
     else:
         return render_template("login_error.html")
 
