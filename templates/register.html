@@ -98,35 +98,19 @@
         <input type="submit">
         <a href="/login">Vai alla pagina del login</a>
         <script>  
-            function verifyPassword() {  
-              var pw = document.getElementById("pw1").value;
-              var pw2 = document.getElementById("pw2").value;  
-              //check empty password field  
-              if(pw == "") {  
-                 document.getElementById("message").innerHTML = "**Fill the password please!";  
-                 return false;  
-              }  
-            
-             //minimum password length validation  
-              if(pw.length < 8) {  
-                 document.getElementById("message").innerHTML = "**Password length must be atleast 8 characters";  
-                 return false;  
-              }  
-              
-            //maximum length of password validation  
-              if(pw.length > 15) {  
-                 document.getElementById("message").innerHTML = "**Password length must not exceed 15 characters";  
-                 return false;  
-              } else {  
-                 alert("Password is correct");  
-              }  
-              //correct insert 
-              if(pw==pw2) {  
-                 document.getElementById("message").innerHTML = "**Password errata";  
-                 return false;  
-              }  
-            }  
-            </script
+            var password = document.getElementById("pw"), confirm_password = document.getElementById("pw2");
+
+            function validatePassword(){
+            if(password.value != confirm_password.value) {
+                confirm_password.setCustomValidity("La password non corrisponde");
+            } else {
+                confirm_password.setCustomValidity('');
+            }
+            }
+
+            password.onchange = validatePassword;
+            confirm_password.onkeyup = validatePassword;
+            </script>
     </form>
 </body>
 
