@@ -28,11 +28,12 @@ def getSingupPage():
 
 @app.route("/dologin", methods=['post'])
 def checkCredentials():
+    # TODO se user == admin and password == admin, reindirizza a admin webpage.html
     user = request.form.get("username")
     psw = HasH.ahsValue(request.form.get("password"))
     check, last = GestisciUtente().logIn(user, psw)
     if check:
-        return render_template("prodotti.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
+        return render_template("adminwebpage.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
     else:
         return render_template("login_error.html")
 
@@ -42,20 +43,19 @@ def getLoginPage():
     return render_template("login.html")
 
 
-@app.route('/nuovoprodotto')
+@app.route('/nuovoprodotto', methods=["get"])
 def nuovoProdotto():
-    return render_template('setprod.html')
+
+    return render_template('addproduct.html')
+
 
 @app.route('/getnuovoprodotto')
 def getNuovoProdotto():
-    nome = request.form.get('nome')
-    produttore = request.form.get('produttore')
-    prezzo = request.form.get('prezzo')
-    '''password = request.form.get('pasw')
-    citta = request.form.get('citta')'''
-    obj = CreaProdotto(nome, produttore, prezzo)
-    obj.packProd()
-    return render_template('table.html')
-    
+    product = CreaProdotto(request.form.get("prodotto"), request.form.get(
+        "produttore"), request.form.get("prezzo"), request.form.get("tags"))
+    product.packProd()
+    return render_template('adminwebpage.html')
+
+
 if __name__ == '__main__':
     app.run()

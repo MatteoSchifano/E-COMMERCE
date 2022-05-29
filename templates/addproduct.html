@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        * {
+            top: 0;
+            left: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #12ff00;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        form {
+            background: #222;
+            width: auto;
+            height: auto;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            position: absolute;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: 20px;
+            justify-content: center;
+            align-items: left;
+            display: flex;
+            flex-direction: column;
+            border-radius: 10px;
+            border: 2px solid black;
+        }
+
+        .label {
+            text-transform: uppercase;
+            color: #12ff00;
+        }
+        a{
+            margin-top: 5px;
+            margin-bottom: 5px;
+            background: black;
+            border: 2px solid #12ff00;
+            border-radius: 5px;
+            padding: 5px;
+            color: #12ff00;
+            text-decoration: none;
+            text-align: center;
+        }
+        input {
+            margin-top: 5px;
+            margin-bottom: 5px;
+            background: black;
+            border: 2px solid #12ff00;
+            border-radius: 5px;
+            padding: 5px;
+            color: #12ff00;
+        }
+        input[type=submit]:hover,a:hover{
+            background: #12ff00;
+            border: 2px solid black;
+            color: black;
+        }
+    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>admin page</title>
+</head>
+
+<body>
+    <h1>Add Product</h1>
+    <form action="/nuovoprodotto" method="get">
+        <label for="nome" class="label">Nome prodotto</label>
+        <input type="text" name="nome" placeholder="Nome prodotto" id="prodotto">        
+        
+        <label for="produttore" class="label">Nome produttore</label>
+        <input type="text" name="produttore" placeholder="Nome produttore" id="produttore">
+
+        <label for="prezzo" class="label">Prezzo</label>
+        <input type="number" step="0.01" name="prezzo" placeholder="prezzo" id="prezzo">
+
+        <label for="tags" class="label">Tags</label>
+        <input type="text" name="tags" placeholder="tags" id="tags">
+
+        <input type="submit">
+
+        <a href="adminwebpage.html">Vai alla pagina principale</a>
+    </form>
+</body>
+
+</html>
