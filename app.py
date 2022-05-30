@@ -15,7 +15,6 @@ def insertUser():
     nome = request.form.get("nome")
     cognome = request.form.get("cognome")
     citta = request.form.get("citta")
-    # obj = Utente(nome, cognome, user, citta, psw)
     obj = CreaUtente(nome, cognome, user, psw, citta)
     obj.packUser()
     return render_template("index.html")
@@ -31,9 +30,11 @@ def checkCredentials():
     # TODO se user == admin and password == admin, reindirizza a admin webpage.html
     user = request.form.get("username")
     psw = HasH.ahsValue(request.form.get("password"))
-    check, last = GestisciUtente().logIn(user, psw)
-    if check:
+    check, last, ad = GestisciUtente().logIn(user, psw)
+    if check == True and ad == True:
         return render_template("adminwebpage.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
+    elif check == True and ad == False:
+        return render_template("welcome.html")
     else:
         return render_template("login_error.html")
 
@@ -45,7 +46,6 @@ def getLoginPage():
 
 @app.route('/nuovoprodotto', methods=["get"])
 def nuovoProdotto():
-
     return render_template('addproduct.html')
 
 

@@ -125,10 +125,11 @@ class GestisciUtente(MainDb):
         qwerry = self.serchDataUtente(qw)
         if len(qwerry)==1:
             last = qwerry[0]['lastAcc']
+            ad = qwerry[0]['admin']
             self.updateDataAccess(qwerry[0])
-            return True, last
+            return True, last, ad
         else:
-            return False, None
+            return False, None, ad
             
     def lastAccess(self):
         '''
@@ -145,7 +146,11 @@ class CreaUtente(GestisciUtente):
         self.username = username
         self.password = password
         self.citta = citta
-        self.lastAcc = self.lastAccess()       
+        self.lastAcc = self.lastAccess()
+        if username == 'admin':
+            self.admin = True
+        else:
+            self.admin = False
         super().__init__()
 
     def packUser(self, ins=True):
@@ -160,7 +165,8 @@ class CreaUtente(GestisciUtente):
             'username':self.username,
             'password':self.password,
             'citta':self.citta,
-            'lastAcc':self.lastAcc
+            'lastAcc':self.lastAcc,
+            'admin':self.admin
         }
         if ins == True:
             self.insertDataUtente(dct)
