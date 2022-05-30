@@ -2,6 +2,7 @@ import datetime
 from pymongo import MongoClient
 from liste import *
 import hashlib
+import pandas as pd
 
 class MainDb: # gestione db
 
@@ -217,4 +218,9 @@ class CreaProdotto(GestisciProdotto):
             self.insertDataProdotto(dct)
         else:
             return dct
-    
+
+class Extract(GestisciProdotto):
+
+    def format(self):
+        lst = self.estrai()
+        return pd.DataFrame.from_dict(lst, orient='columns')
