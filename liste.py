@@ -8,4 +8,5 @@ tags = [('telefono', 'apple', 'iphone', 'informatica'),
         ('cibo', 'frutta'), 
         ('cibo', 'frutta'),
         ('telefono', 'gioco', 'samsung', 'informatica'),
-        ('gioco', 'sport'), ('gioco', 'sport')]
+        ('gioco', 'sport'), 
+        ('gioco', 'sport')]
