@@ -220,7 +220,10 @@ class CreaProdotto(GestisciProdotto):
             return dct
 
 class Extract(GestisciProdotto):
-
+    
     def format(self):
+        '''
+        estrae tutto il database e restituisce un dataframe
+        '''
         lst = self.estrai()
         return pd.DataFrame.from_dict(lst, orient='columns')
