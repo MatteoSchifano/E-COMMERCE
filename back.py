@@ -6,8 +6,8 @@ import pandas as pd
 
 class MainDb: # gestione db
 
-    # def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
-    def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    # def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
         self.cli = cli
         self.db = db
 

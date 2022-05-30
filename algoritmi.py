@@ -90,6 +90,7 @@ tags = df.iloc[:, -4:-1]
 tags = tags[tags.columns[:]].apply(
     lambda x: ','.join(x.dropna().astype(str)),
     axis=1)
+
 # concatenazione dei diversi dataframe e rinomina delle colonne
 df3 = pd.concat([nomi, produttori, prezzi, tags], axis=1)
 df3.columns = ['nome', 'produttore', 'prezzo', 'tags']
@@ -100,7 +101,6 @@ print(df3.head())
 dict_df = df3.to_json(orient='records')
 
 import json
-with open("outputfile.json", "w") as final:
-    parsed = json.loads(dict_df)
-    json.dump(parsed, final, indent=4) 
-    
+parsed = json.loads(dict_df)
+
+GestisciProdotto().insertDataProdotto(parsed, one=False)
