@@ -99,4 +99,8 @@ print(df3.head())
 
 dict_df = df3.to_json(orient='records')
 
-GestisciProdotto().insertDataProdotto(dict_df, one=False)
+import json
+with open("outputfile.json", "w") as final:
+    parsed = json.loads(dict_df)
+    json.dump(parsed, final, indent=4) 
+    
