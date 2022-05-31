@@ -85,11 +85,22 @@ def predicta(df):
     X = np.array(df.iloc[:, 1:])
     knn = NearestNeighbors(n_neighbors=3, algorithm='auto').fit(X)
     distances, indices = knn.kneighbors(X)
-    print(distances, indices)
+    return distances, indices
+
+def prodotti_correlati(df, acquisto):
+    _, indices = predicta(df)
+    indice_acquisto = df[df['nome'] == acquisto].index 
+    for x in indices:
+        if x[0] == indice_acquisto:
+            ls_prodotti_correlati = [df.loc[y, 0] for y in x[1:]]
+
+    return ls_prodotti_correlati
+
+
 
 # preprocessing dati di mongo
 df = preprocessing(Extract().format())
 
-print (df)
+print(df)
 # print (df.iloc[:, 1:])
-predicta(df)
+print(predicta(df))
