@@ -1,9 +1,8 @@
 import datetime
 from pymongo import MongoClient
-from liste import *
+# from liste import *
 import hashlib
 import pandas as pd
-from algoritmi import consiglia_prodotti
 
 class MainDb: # gestione db
 
@@ -245,9 +244,114 @@ class Carrello(GestisciProdotto):
 
     def correlati(self, lung:int = 5):
         idprod = self.lst[-1]['_id']
-        correlati = consiglia_prodotti(idprod)
+        correlati = CorreletedProduct(df=Extract().format()).consiglia_prodotti(idprod)
         cor = correlati[0:lung]
         lista = []
         for el in cor:
             lista.append(self.serchDataProdotto({'_id':el}))
         return lista
+
+# ===============================================================
+import numpy as np
+import pandas as pd
+
+import ast
+
+
+
+from sklearn.neighbors import NearestNeighbors
+from sklearn.preprocessing import OrdinalEncoder
+from sklearn.preprocessing import MultiLabelBinarizer
+from sklearn.preprocessing import StandardScaler
+class CorreletedProduct():
+
+    def __init__(self, df = Extract().format(), target:dict=None):
+        self.df     = self.preprocessing(df)
+        self.target = target
+
+    def __modella_csv():
+        '''TODO da eliminare'''
+        df = pd.read_csv('Product.csv')
+
+        # utilizziamo le colonne strettamente necessarie
+        nomi = df.iloc[:, 1]
+        produttori = df.iloc[:, 9]
+        prezzi = df.iloc[:, -1]
+        tags = df.iloc[:, -4:-1]
+        # unione dei tags
+        tags = tags[tags.columns[:]].apply(
+            lambda x: ','.join(x.dropna().astype(str)),
+            axis=1)
+
+        # concatenazione dei diversi dataframe e rinomina delle colonne
+        df3 = pd.concat([nomi, produttori, prezzi, tags], axis=1)
+        df3.columns = ['nome', 'produttore', 'prezzo', 'tags']
+
+        df3.dropna()
+
+        dict_df = df3.to_json(orient='records')
+
+        import json
+        parsed = json.loads(dict_df)
+
+        GestisciProdotto().insertDataProdotto(parsed, one=False)
+
+
+    def preprocessing(self, df):
+        # permette di la divisione dei tags
+        df.tags = df.tags.str[1:-1].str.split(',').tolist()
+
+        oe = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
+        oe.fit(np.array(df['produttore']).reshape(-1, 1))
+        p = oe.transform(np.array(df['produttore']).reshape(-1, 1))
+
+        def diz_nome_codice(keys, values):
+            diz = {k: int(v) for k, v in zip(keys, values)}
+            return diz
+
+        diz_prod = diz_nome_codice(df['produttore'], p)
+        new_prod = [diz_prod[p] for p in df['produttore']]
+        df['produttore'] = new_prod
+
+
+        mlb = MultiLabelBinarizer()
+
+        df2 = pd.DataFrame(mlb.fit_transform(df.tags),
+                        columns=mlb.classes_, index=df.index)
+
+        scaler = StandardScaler()
+        # transform data
+        df['prezzo'] = scaler.fit_transform(df['prezzo'].values.reshape(-1, 1))
+
+        df = pd.concat([df, df2], axis=1)
+        del df['tags']
+        df = df.dropna()
+        return df
+
+
+    def predicta(self, df):
+        X = np.array(df.iloc[:, 2:])
+        knn = NearestNeighbors(n_neighbors=5, algorithm='auto').fit(X)
+        distances, indices = knn.kneighbors(X)
+        return distances, indices
+
+
+    def prodotti_correlati(self, prodotto):
+        _, indices = self.predicta(self.df)
+
+        self.target = ast.literal_eval(prodotto)
+        prodotto_acquistato = self.df.loc[self.df['_id'] == self.target['_id']]
+        for x in indices:
+            if x[0] == prodotto_acquistato.index[0]:
+                ls = [self.df.iloc[y, 0] for y in x[1:]]
+
+        return ls
+
+    def consiglia_prodotti(self, carrello):
+        '''funzione che consiglia altri prodotti
+
+        :param ObjectID carrello: _ID DEL PRODOTTO
+        '''    
+        # preprocessing dati di mongo
+        ls_prodotti_correlati = self.prodotti_correlati(self.df, carrello)
+        return ls_prodotti_correlati
