@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from liste import *
 import hashlib
 import pandas as pd
+from algoritmi import consiglia_prodotti
 
 class MainDb: # gestione db
 
@@ -39,7 +40,10 @@ class MainDb: # gestione db
         restituisce una lista di dizionari corrispondenti alla qwerry
         '''
         client, col = self.connect(coll)
-        post = list(col.find(filter=qwer, projection=proj, limit=lim))
+        if lim:
+            post = list(col.find(filter=qwer, projection=proj, limit=lim))
+        else:
+            post = list(col.find(filter=qwer, projection=proj))
         client.close()
         return post
         
@@ -178,7 +182,7 @@ class GestisciProdotto(MainDb):
 
     coll='prodotto'
 
-    def serchDataProdotto(self, qwer: dict, proj: dict = None, lim: int = 20):
+    def serchDataProdotto(self, qwer: dict, proj: dict = None, lim: int = None):
         return super().serchData(self.coll, qwer, proj, lim)
     
     def insertDataProdotto(self, dct, one=True):
@@ -230,9 +234,20 @@ class Extract(GestisciProdotto):
 
 class Carrello(GestisciProdotto):
 
+    lst = []
+
     def __init__(self) -> None:
         pass
 
-    def correlati(self, idprod):
-        qw = {'_id':idprod}
-        self.serchDataProdotto(qw)
+    def aggACarrello(self,**kargs):
+        self.lst.append(**kargs)
+        return self.lst
+
+    def correlati(self, lung:int = 5):
+        idprod = self.lst[-1]['_id']
+        correlati = consiglia_prodotti(idprod)
+        cor = correlati[0:lung]
+        lista = []
+        for el in cor:
+            lista.append(self.serchDataProdotto({'_id':el}))
+        return lista
