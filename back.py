@@ -130,7 +130,7 @@ class GestisciUtente(MainDb):
             self.updateDataAccess(qwerry[0])
             return True, last, ad
         else:
-            return False, None, ad
+            return False, None, 0
             
     def lastAccess(self):
         '''
@@ -149,9 +149,9 @@ class CreaUtente(GestisciUtente):
         self.citta = citta
         self.lastAcc = self.lastAccess()
         if username == 'admin':
-            self.admin = True
+            self.admin = 1
         else:
-            self.admin = False
+            self.admin = 0
         super().__init__()
 
     def packUser(self, ins=True):

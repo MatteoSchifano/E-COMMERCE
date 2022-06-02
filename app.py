@@ -31,10 +31,10 @@ def checkCredentials():
     user = request.form.get("username")
     psw = HasH.ahsValue(request.form.get("password"))
     check, last, ad = GestisciUtente().logIn(user, psw)
-    if check == True and ad == True:
+    if check == True and ad == 1:
         return render_template("adminwebpage.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
-    elif check == True and ad == False:
-        return render_template("welcome.html")
+    elif check == True and ad == 0:
+        return render_template("prodotti.html")
     else:
         return render_template("login_error.html")
 
@@ -49,7 +49,7 @@ def nuovoProdotto():
     return render_template('addproduct.html')
 
 
-@app.route('/getnuovoprodotto')
+@app.route('/getnuovoprodotto', methods=["get"])
 def getNuovoProdotto():
     product = CreaProdotto(request.form.get("prodotto"), request.form.get(
         "produttore"), request.form.get("prezzo"), request.form.get("tags"))
