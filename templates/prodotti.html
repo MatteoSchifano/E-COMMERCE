@@ -32,25 +32,13 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
 <!-- !PAGE CONTENT! -->
 <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
     <div class="w3-row-padding w3-padding-16 w3-center" id="food">  
-        <!-- <py-script>
-
-ls_prodotti =  list(db.serchData(qwer = {}))
-
-for x in ls_prodotti:
-    print("""<div class="w3-quarter">
-        <h3>{}</h3>
-        <h2>{}</h2>
-        <p>{}€</p>
-        </div>""".format(x.nome, x.produttore, x.prezzo))
-
-        </py-script> -->
 
         {% for x in dati%}
         <div class="w3-quarter">
             <h3>{{x.nome}}</h3>
             <h4>{{x.produttore}}</h4>
             <p>{{x.prezzo}}€</p>
-            </div>
+        </div>
 
         {%endfor%}
  

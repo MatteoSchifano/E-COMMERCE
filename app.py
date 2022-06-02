@@ -27,14 +27,13 @@ def getSingupPage():
 
 @app.route("/dologin", methods=['post'])
 def checkCredentials():
-    # TODO se user == admin and password == admin, reindirizza a admin webpage.html
     user = request.form.get("username")
     psw = HasH.ahsValue(request.form.get("password"))
     check, last, ad = GestisciUtente().logIn(user, psw)
     if check == True and ad == 1:
         return render_template("adminwebpage.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
     elif check == True and ad == 0:
-        return render_template("prodotti.html")
+        return render_template("prodotti.html", username=user, lastAccess=last, dati=GestisciProdotto().estrai())
     else:
         return render_template("login_error.html")
 
@@ -49,12 +48,15 @@ def nuovoProdotto():
     return render_template('addproduct.html')
 
 
-@app.route('/getnuovoprodotto', methods=["get"])
+@app.route('/getnuovoprodotto', methods=["post"])
 def getNuovoProdotto():
-    product = CreaProdotto(request.form.get("prodotto"), request.form.get(
-        "produttore"), request.form.get("prezzo"), request.form.get("tags"))
+    prod = request.form.get("prodotto")
+    produttore = request.form.get("produttore")
+    prezzo = request.form.get("prezzo")
+    tags = request.form.get("tags")
+    product = CreaProdotto(prod, produttore, prezzo, tags)
     product.packProd()
-    return render_template('adminwebpage.html')
+    return render_template('adminwebpage.html', dati=GestisciProdotto().estrai())
 
 
 if __name__ == '__main__':

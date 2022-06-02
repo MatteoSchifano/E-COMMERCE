@@ -72,9 +72,9 @@
 
 <body>
     <h1>Add Product</h1>
-    <form action="/nuovoprodotto" method="get">
-        <label for="nome" class="label">Nome prodotto</label>
-        <input type="text" name="nome" placeholder="Nome prodotto" id="prodotto">        
+    <form action="/getnuovoprodotto" method="post">
+        <label for="prodotto" class="label">Nome prodotto</label>
+        <input type="text" name="prodotto" placeholder="Nome prodotto" id="prodotto">        
         
         <label for="produttore" class="label">Nome produttore</label>
         <input type="text" name="produttore" placeholder="Nome produttore" id="produttore">
@@ -87,7 +87,7 @@
 
         <input type="submit">
 
-        <a href="adminwebpage.html">Vai alla pagina principale</a>
+        <!-- <a href="templates\addproduct.html">Vai alla pagina principale</a> -->
     </form>
 </body>
 
