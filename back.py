@@ -34,7 +34,7 @@ class MainDb: # gestione db
             col.insert_many(dct)
         client.close()
 
-    def serchData(self, coll, qwer:dict, proj:dict = None, lim:int = 20):
+    def serchData(self, coll, qwer:dict, proj:dict = None, lim:int = None):
         '''
         restituisce una lista di dizionari corrispondenti alla qwerry
         '''
@@ -227,3 +227,12 @@ class Extract(GestisciProdotto):
         '''
         lst = self.estrai()
         return pd.DataFrame.from_dict(lst, orient='columns')
+
+class Carrello(GestisciProdotto):
+
+    def __init__(self) -> None:
+        pass
+
+    def correlati(self, idprod):
+        qw = {'_id':idprod}
+        self.serchDataProdotto(qw)
