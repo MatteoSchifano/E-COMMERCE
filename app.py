@@ -58,18 +58,23 @@ def getNuovoProdotto():
     product.packProd()
     return render_template('adminwebpage.html', dati=GestisciProdotto().estrai())
 
+@app.route('/returntoprodotti')
+def tornaIndietro():
+    return render_template('prodotti.html', dati=GestisciProdotto().estrai())
+
+
+import re
 
 @app.route('/prodotti_correlati', methods=["POST"])
 def prodottiCorrelati():
     prodotto_acquistato = dict(request.form)['prodotto_acquistato']
-    print(prodotto_acquistato)
+    print(prodotto_acquistato[18:42], type(prodotto_acquistato))
+    
     # esempio di stampa
-    # prodotto_acquistato = {'_id': ObjectId('6298a0313491ed1f6804477a'), 'nome': 'White ^un^ Coaches Flex Slouch Hat',
-    #  'produttore': 'Adidas', 'prezzo': 28, 'tags': 'Clothing & Accessories,Men,Hats'}
+    # prodotto_acquistato = """{'_id': ObjectId('6298a0313491ed1f6804477a'), 'nome': 'White ^un^ Coaches Flex Slouch Hat',
+    #  'produttore': 'Adidas', 'prezzo': 28, 'tags': 'Clothing & Accessories,Men,Hats'}"""
     # passando questi dati al back tramite query troviamo il prodotto acquistato.
-    # TODO far visualizzare i correlati in prodotti_correlati.html
-    # dati=todo_correlati()
-    return render_template('prodotti_correlati.html', dati=CorreletedProduct().prodotti_correlati(prodotto_acquistato))
+    return render_template('prodotti_correlati.html', dati=CorreletedProduct().prodotti_correlati(prodotto_acquistato[18:42]))
 
 
 if __name__ == '__main__':

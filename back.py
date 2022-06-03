@@ -1,5 +1,6 @@
 import datetime
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 # from liste import *
 import hashlib
 import pandas as pd
@@ -265,9 +266,8 @@ from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.preprocessing import StandardScaler
 class CorreletedProduct():
 
-    def __init__(self, df = Extract().format(), target:dict=None):
+    def __init__(self, df = Extract().format()):
         self.df     = self.preprocessing(df)
-        self.target = target
 
     def __modella_csv():
         '''TODO da eliminare'''
@@ -311,8 +311,7 @@ class CorreletedProduct():
 
         diz_prod = diz_nome_codice(df['produttore'], p)
         new_prod = [diz_prod[p] for p in df['produttore']]
-        df['produttore'] = new_prod
-
+        df['produttore_num'] = new_prod
 
         mlb = MultiLabelBinarizer()
 
@@ -321,31 +320,32 @@ class CorreletedProduct():
 
         scaler = StandardScaler()
         # transform data
-        df['prezzo'] = scaler.fit_transform(df['prezzo'].values.reshape(-1, 1))
+        df['prezzo_std'] = scaler.fit_transform(df['prezzo'].values.reshape(-1, 1))
 
         df = pd.concat([df, df2], axis=1)
         del df['tags']
         df = df.dropna()
+        print(df.columns)
         return df
 
 
     def predicta(self, df):
-        X = np.array(df.iloc[:, 2:])
+        X = np.array(df.iloc[:, 4:])
         knn = NearestNeighbors(n_neighbors=5, algorithm='auto').fit(X)
         distances, indices = knn.kneighbors(X)
         return distances, indices
 
 
-    def prodotti_correlati(self, prodotto):
+    def prodotti_correlati(self, id_prodotto):
         _, indices = self.predicta(self.df)
 
-        self.target = ast.literal_eval(prodotto)
-        prodotto_acquistato = self.df.loc[self.df['_id'] == self.target['_id']]
+        prodotto_acquistato = self.df.loc[self.df['_id'] == ObjectId(id_prodotto)]
         for x in indices:
             if x[0] == prodotto_acquistato.index[0]:
-                ls = [self.df.iloc[y, 0] for y in x[1:]]
-
-        return ls
+                ls = [self.df.iloc[y, 1:] for y in x[1:]]
+                print(ls)
+                return ls
+        return []
 
     def consiglia_prodotti(self, carrello):
         '''funzione che consiglia altri prodotti
