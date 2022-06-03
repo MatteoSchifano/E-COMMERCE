@@ -34,17 +34,16 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
 <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
     <div class="w3-row-padding w3-padding-16 w3-center" id="product">  
 
-        {% for x in dati%}
-        <div class="w3-quarter">
-          <form action="/prodotti_correlati" method="post">
-            <h3 id="prodotto">{{x.nome}}</h3>
-            <h4 id="produttore">{{x.produttore}}</h4>
-            <p id="prezzo">{{x.prezzo}}€</p>
-            <input type="submit">Aggiungi al carrello</input>
-          </form>
-        </div>
-
-        {%endfor%}
+      {% for x in dati%}
+      <div class="w3-quarter">
+        <form action="/prodotti_correlati" method="POST">
+          <h3 id="prodotto"  name="prodotto" value="{{x.nome}}">{{x.nome}}</h3>
+          <h4 id="produttore" name="produttore" value="{{x.produttore}}">{{x.produttore}}</h4>
+          <p  id="prezzo"  name="prezzo" value="{{x.prezzo}}">{{x.prezzo}}€</p>
+          <button type="submit" name="prodotto_acquistato" value="{{x}}">Aggiungi al carrello </button>
+        </form>
+      </div>
+      {%endfor%}
  
 <!-- End page content -->
 </div>
