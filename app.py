@@ -58,12 +58,11 @@ def getNuovoProdotto():
     product.packProd()
     return render_template('adminwebpage.html', dati=GestisciProdotto().estrai())
 
+
 @app.route('/returntoprodotti')
 def tornaIndietro():
     return render_template('prodotti.html', dati=GestisciProdotto().estrai())
 
-
-import re
 
 @app.route('/prodotti_correlati', methods=["POST"])
 def prodottiCorrelati():

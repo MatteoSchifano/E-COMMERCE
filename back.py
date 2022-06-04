@@ -7,8 +7,8 @@ import pandas as pd
 
 class MainDb: # gestione db
 
-    # def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
-    def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    # def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
         self.cli = cli
         self.db = db
 
@@ -239,16 +239,14 @@ class Carrello(GestisciProdotto):
     def __init__(self) -> None:
         pass
 
-    def aggACarrello(self,**kargs):
-        self.lst.append(**kargs)
-        return self.lst
+    def aggACarrello(self, prod):
+        self.lst.append(prod)
 
-    def correlati(self, lung:int = 5):
+    def correlati(self, lung):
         idprod = self.lst[-1]['_id']
-        correlati = CorreletedProduct(df=Extract().format()).consiglia_prodotti(idprod)
-        cor = correlati[0:lung]
+        correlati = CorreletedProduct(df=Extract().format()).prodotti_correlati(idprod, n_corr=lung)
         lista = []
-        for el in cor:
+        for el in correlati:
             lista.append(self.serchDataProdotto({'_id':el}))
         return lista
 
@@ -256,14 +254,11 @@ class Carrello(GestisciProdotto):
 import numpy as np
 import pandas as pd
 
-import ast
-
-
-
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import OrdinalEncoder
 from sklearn.preprocessing import MultiLabelBinarizer
 from sklearn.preprocessing import StandardScaler
+
 class CorreletedProduct():
 
     def __init__(self, df = Extract().format()):
@@ -302,6 +297,7 @@ class CorreletedProduct():
         return df
 
 
+
     def predicta(self, df, k = 11):
         '''funzione che classifica secondo la distanza euclidea i dati all'interno del df
 
@@ -309,10 +305,12 @@ class CorreletedProduct():
         :param int k: numero di neighbors 
         :return tuple: distanze euclidee, lista di indici dei records correlati tra loro 
         '''        
+
         X = np.array(df.iloc[:, 4:])
         knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(X)
         distances, indices = knn.kneighbors(X)
         return distances, indices
+
 
 
     def prodotti_correlati(self, id_prodotto, n_corr = 11):
@@ -324,6 +322,7 @@ class CorreletedProduct():
         '''        
         _, indices = self.predicta(self.df, n_corr)
 
+
         prodotto_acquistato = self.df.loc[self.df['_id'] == ObjectId(id_prodotto)]
         for x in indices:
             if x[0] == prodotto_acquistato.index[0]:
@@ -332,11 +331,11 @@ class CorreletedProduct():
                 return ls
         return []
 
-    def consiglia_prodotti(self, carrello):
+    def consiglia_prodotti(self, id_prodotto):
         '''funzione che consiglia altri prodotti
 
-        :param ObjectID carrello: _ID DEL PRODOTTO
+        :param ObjectID id_prodotto: _ID DEL PRODOTTO
         '''    
         # preprocessing dati di mongo
-        ls_prodotti_correlati = self.prodotti_correlati(self.df, carrello)
+        ls_prodotti_correlati = self.prodotti_correlati(self.df, id_prodotto)
         return ls_prodotti_correlati
