@@ -232,18 +232,17 @@ class Extract(GestisciProdotto):
         lst = self.estrai()
         return pd.DataFrame.from_dict(lst, orient='columns')
 
-class Carrello(GestisciProdotto):
+class Carrello(MainDb):
 
     lst = []
+    coll = 'prodotto'
 
     def __init__(self) -> None:
         pass
 
     def aggACarrello(self, id_prod):
-        res = self.serchDataProdotto({'_id':id_prod}) 
-        print(res)
-        res = self.serchDataProdotto({'_id':ObjectId(id_prod)}) 
-        print(res)
+        res = self.serchData(self.coll, {'_id':id_prod}) 
+        # res = self.serchDataProdotto({'_id':ObjectId(id_prod)}) 
         assert type(res[0]) == dict
         self.lst.append(res[0])
 
