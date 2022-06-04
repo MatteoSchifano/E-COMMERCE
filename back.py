@@ -331,8 +331,7 @@ class CorreletedProduct():
         prodotto_acquistato = self.df.loc[self.df['_id'] == ObjectId(id_prodotto)]
         for x in indices:
             if x[0] == prodotto_acquistato.index[0]:
-                ls = [self.df.iloc[y, 1:] for y in x[1:]]
-                print(ls)
+                ls = [self.df.iloc[y, :] for y in x]
                 return ls
         return []
 

@@ -20,10 +20,9 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
   class="w3-bar-item w3-button">Chiudi Menu</a>
   <a href="#product" onclick="w3_close()" class="w3-bar-item w3-button">Prodotti</a>
   <a href="/returntoprodotti" onclick="w3_close()" class="w3-bar-item w3-button">Torna alla pagina prodotti</a>
-
-  {% for x in dati_carrello%}
-  <p class="w3-bar-item w3-button">{{x.nome}}, {{x.prezzo}}€</p>   
-  {%endfor%}
+  <br>
+  <h2>Carrello</h2>
+  <p class="w3-bar-item w3-button">{{dati_carrello.nome}}, {{dati_carrello.prezzo}}€</p>   
 
 </nav>
 
