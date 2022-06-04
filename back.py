@@ -7,8 +7,8 @@ import pandas as pd
 
 class MainDb: # gestione db
 
-    def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
-    # def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
+    # def __init__(self, cli = 'mongodb://localhost:37000/', db = 'Iot'):
+    def __init__(self, cli = 'mongodb://localhost:27017/', db = 'Iot'):
         self.cli = cli
         self.db = db
 
@@ -239,8 +239,13 @@ class Carrello(GestisciProdotto):
     def __init__(self) -> None:
         pass
 
-    def aggACarrello(self, prod):
-        self.lst.append(prod)
+    def aggACarrello(self, id_prod):
+        res = self.serchDataProdotto({'_id':id_prod}) 
+        print(res)
+        res = self.serchDataProdotto({'_id':ObjectId(id_prod)}) 
+        print(res)
+        assert type(res[0]) == dict
+        self.lst.append(res[0])
 
     def correlati(self, lung):
         idprod = self.lst[-1]['_id']

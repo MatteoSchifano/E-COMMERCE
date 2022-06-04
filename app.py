@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from back import CorreletedProduct, CreaUtente, GestisciUtente, CreaProdotto, GestisciProdotto, HasH
+from back import CorreletedProduct, CreaUtente, GestisciUtente, CreaProdotto, GestisciProdotto, HasH, Carrello
 app = Flask(__name__)
 
 
@@ -67,12 +67,11 @@ def tornaIndietro():
 @app.route('/prodotti_correlati', methods=["POST"])
 def prodottiCorrelati():
     prodotto_acquistato = dict(request.form)['prodotto_acquistato']
-    print(prodotto_acquistato[18:42], type(prodotto_acquistato))
-    
+    Carrello().aggACarrello(prodotto_acquistato[18:42])
     # esempio di stampa
-    # prodotto_acquistato = """{'_id': ObjectId('6298a0313491ed1f6804477a'), 'nome': 'White ^un^ Coaches Flex Slouch Hat',
+    # prodotto_acquistato = """{'_id': ObjectId('6298a0313491ed1f6804477a'), 'nome': 'White Coaches Flex Slouch Hat',
     #  'produttore': 'Adidas', 'prezzo': 28, 'tags': 'Clothing & Accessories,Men,Hats'}"""
-    return render_template('prodotti_correlati.html', dati=CorreletedProduct().prodotti_correlati(prodotto_acquistato[18:42]))
+    return render_template('prodotti_correlati.html', dati=CorreletedProduct().prodotti_correlati(prodotto_acquistato[18:42]), dati_carrello=Carrello().lst)
 
 
 if __name__ == '__main__':
