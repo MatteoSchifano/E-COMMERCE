@@ -264,32 +264,6 @@ class CorreletedProduct():
     def __init__(self, df = Extract().format()):
         self.df     = self.preprocessing(df)
 
-    def __modella_csv():
-        '''TODO da eliminare'''
-        df = pd.read_csv('Product.csv')
-
-        # utilizziamo le colonne strettamente necessarie
-        nomi = df.iloc[:, 1]
-        produttori = df.iloc[:, 9]
-        prezzi = df.iloc[:, -1]
-        tags = df.iloc[:, -4:-1]
-        # unione dei tags
-        tags = tags[tags.columns[:]].apply(
-            lambda x: ','.join(x.dropna().astype(str)),
-            axis=1)
-
-        # concatenazione dei diversi dataframe e rinomina delle colonne
-        df3 = pd.concat([nomi, produttori, prezzi, tags], axis=1)
-        df3.columns = ['nome', 'produttore', 'prezzo', 'tags']
-
-        df3.dropna()
-
-        dict_df = df3.to_json(orient='records')
-
-        import json
-        parsed = json.loads(dict_df)
-
-        GestisciProdotto().insertDataProdotto(parsed, one=False)
 
     def preprocessing(self, df):
         # permette di la divisione dei tags
@@ -322,14 +296,32 @@ class CorreletedProduct():
         print(df.columns)
         return df
 
-    def predicta(self, df):
+
+
+    def predicta(self, df, k = 11):
+        '''funzione che classifica secondo la distanza euclidea i dati all'interno del df
+
+        :param pd.DataFrame df: dataframe contenente tutti i dati
+        :param int k: numero di neighbors 
+        :return tuple: distanze euclidee, lista di indici dei records correlati tra loro 
+        '''        
+
         X = np.array(df.iloc[:, 4:])
-        knn = NearestNeighbors(n_neighbors=5, algorithm='auto').fit(X)
+        knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(X)
         distances, indices = knn.kneighbors(X)
         return distances, indices
 
-    def prodotti_correlati(self, id_prodotto):
-        _, indices = self.predicta(self.df)
+
+
+    def prodotti_correlati(self, id_prodotto, n_corr = 11):
+        '''ritorna una lista di prodotti correlati al prodotto in input (quello che viene acquistato)
+
+        :param ObjectId id_prodotto: id del prodotto acquistato in foramto
+        :param int n_corr: numero di neighbors 
+        :return list: lista dei prodotti correlati
+        '''        
+        _, indices = self.predicta(self.df, n_corr)
+
 
         prodotto_acquistato = self.df.loc[self.df['_id'] == ObjectId(id_prodotto)]
         for x in indices:

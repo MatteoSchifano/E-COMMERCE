@@ -72,7 +72,6 @@ def prodottiCorrelati():
     # esempio di stampa
     # prodotto_acquistato = """{'_id': ObjectId('6298a0313491ed1f6804477a'), 'nome': 'White ^un^ Coaches Flex Slouch Hat',
     #  'produttore': 'Adidas', 'prezzo': 28, 'tags': 'Clothing & Accessories,Men,Hats'}"""
-    # passando questi dati al back tramite query troviamo il prodotto acquistato.
     return render_template('prodotti_correlati.html', dati=CorreletedProduct().prodotti_correlati(prodotto_acquistato[18:42]))
 
 
