@@ -297,7 +297,7 @@ class CorreletedProduct():
         df = pd.concat([df, df2], axis=1)
         del df['tags']
         df = df.dropna()
-        print(df.columns)
+        df.reset_index(inplace = True, drop = True)
         return df
 
 
