@@ -64,18 +64,21 @@ def tornaIndietro():
     return render_template('prodotti.html', dati=GestisciProdotto().estrai())
 
 
+@app.route('/compra')
+def compra():
+    return render_template('compra.html')
+
 
 @app.route('/prodotti_correlati', methods=["POST"])
 def prodottiCorrelati():
     prodotto_acquistato = dict(request.form)['prodotto_acquistato']
-    dati = CorreletedProduct().prodotti_correlati(prodotto_acquistato[18:42], n_corr=7)
-    print(dati)
+    dati, carrello = CorreletedProduct().prodotti_correlati(prodotto_acquistato[18:42], n_corr=7)
+    
     # esempio di stampa
     # prodotto_acquistato = """{'_id': ObjectId('6298a0313491ed1f6804477a'), 'nome': 'White Coaches Flex Slouch Hat',
     #  'produttore': 'Adidas', 'prezzo': 28, 'tags': 'Clothing & Accessories,Men,Hats'}"""
-    if dati:
-        return render_template('prodotti_correlati.html', dati=dati[1:], dati_carrello=dati[0])
-    else:
-        return render_template('prodotti_correlati.html', dati=[], dati_carrello=[])
+    return render_template('prodotti_correlati.html', dati=dati, dati_carrello=carrello)
+
+
 if __name__ == '__main__':
     app.run()

@@ -266,28 +266,28 @@ from sklearn.preprocessing import StandardScaler
 class CorreletedProduct():
 
     def __init__(self, df = Extract().format()):
+        try:    del self.df
+        except:
+            print("errore in CorreletedProduct")
+            pass
         self.df     = self.preprocessing(df)
 
 
     def preprocessing(self, df):
         # permette di la divisione dei tags
-        df.tags = df.tags.str[1:-1].str.split(',').tolist()
+        tags = df.tags.str[1:-1].str.split(',').tolist()
 
         oe = OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1)
         oe.fit(np.array(df['produttore']).reshape(-1, 1))
         p = oe.transform(np.array(df['produttore']).reshape(-1, 1))
 
-        def diz_nome_codice(keys, values):
-            diz = {k: int(v) for k, v in zip(keys, values)}
-            return diz
-
-        diz_prod = diz_nome_codice(df['produttore'], p)
+        diz_prod = {k: int(v) for k, v in zip(df['produttore'], p)}
         new_prod = [diz_prod[p] for p in df['produttore']]
         df['produttore_num'] = new_prod
 
         mlb = MultiLabelBinarizer()
 
-        df2 = pd.DataFrame(mlb.fit_transform(df.tags),
+        df2 = pd.DataFrame(mlb.fit_transform(tags),
                         columns=mlb.classes_, index=df.index)
 
         scaler = StandardScaler()
@@ -295,9 +295,10 @@ class CorreletedProduct():
         df['prezzo_std'] = scaler.fit_transform(df['prezzo'].values.reshape(-1, 1))
 
         df = pd.concat([df, df2], axis=1)
-        del df['tags']
+        
         df = df.dropna()
         df.reset_index(inplace = True, drop = True)
+        
         return df
 
 
@@ -310,10 +311,11 @@ class CorreletedProduct():
         :return tuple: distanze euclidee, lista di indici dei records correlati tra loro 
         '''        
 
-        X = np.array(df.iloc[:, 4:])
+        X = np.array(df.iloc[:, 5:])
         knn = NearestNeighbors(n_neighbors=k, algorithm='auto').fit(X)
         distances, indices = knn.kneighbors(X)
         return distances, indices
+
 
 
 
@@ -328,11 +330,15 @@ class CorreletedProduct():
 
 
         prodotto_acquistato = self.df.loc[self.df['_id'] == ObjectId(id_prodotto)]
-        for x in indices:
-            if x[0] == prodotto_acquistato.index[0]:
-                ls = [self.df.iloc[y, :] for y in x]
-                return ls
-        return []
+
+        for cluster in indices:
+            if prodotto_acquistato.index[0] in cluster:
+                i_prod_cluster = np.where(cluster == prodotto_acquistato.index[0])[0]
+                ls = [self.df.iloc[y, :] for y in cluster]
+                res = ls[i_prod_cluster[0]]
+                del ls[i_prod_cluster[0]]
+                return ls, res
+        return 
 
     def consiglia_prodotti(self, id_prodotto):
         '''funzione che consiglia altri prodotti
@@ -342,3 +348,7 @@ class CorreletedProduct():
         # preprocessing dati di mongo
         ls_prodotti_correlati = self.prodotti_correlati(self.df, id_prodotto)
         return ls_prodotti_correlati
+    
+
+if __name__ == '__main__':
+    pass

@@ -40,7 +40,7 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
 
       {% for x in dati%}
       <div class="w3-quarter">
-        <form action="/prodotti_correlati" method="POST">
+        <form action="/compra_correlato" method="POST">
           <h3 id="prodotto"  name="prodotto" value="{{x.nome}}">{{x.nome}}</h3>
           <h4 id="produttore" name="produttore" value="{{x.produttore}}">{{x.produttore}}</h4>
           <p  id="prezzo"  name="prezzo" value="{{x.prezzo}}">{{x.prezzo}}€</p>
@@ -51,6 +51,7 @@ body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
  
 <!-- End page content -->
 </div>
+<a href="/compra" >Concludi l'acquisto</a>
 <script>
 // Script to open and close sidebar
 function w3_open() {
